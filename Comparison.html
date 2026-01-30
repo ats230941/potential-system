@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrier & Internet Intelligence 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-anim { transition: all 0.2s ease-in-out; }
+        .card-anim:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .tab-active { border-bottom: 2px solid #ef4444; color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold">C</div>
+                <h1 class="text-xl font-bold tracking-tight">Competitive<span class="text-red-600">Sync</span></h1>
+            </div>
+            <div class="flex gap-4 text-sm font-medium">
+                <button onclick="switchTab('mobile')" id="btn-mobile" class="tab-active py-5 px-2">Mobile Plans</button>
+                <button onclick="switchTab('internet')" id="btn-internet" class="py-5 px-2 text-gray-500 hover:text-red-600">Home Internet</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Global Controls -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border mb-8 flex flex-wrap gap-8 items-end">
+            <div id="line-control">
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Household Lines</label>
+                <select id="lineCount" onchange="renderAll()" class="w-40 p-2 border rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-red-500">
+                    <option value="1">1 Line</option>
+                    <option value="2">2 Lines</option>
+                    <option value="3">3 Lines</option>
+                    <option value="4" selected>4 Lines</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2 pb-2">
+                <input type="checkbox" id="promoToggle" checked onchange="renderAll()" class="w-5 h-5 accent-red-600">
+                <label for="promoToggle" class="text-sm font-semibold text-gray-700">Apply Current Promos</label>
+            </div>
+            <div class="ml-auto text-right">
+                <span class="text-xs text-gray-400 block italic">Market Data Verified</span>
+                <span class="text-sm font-bold text-green-600">Live: Jan 2026</span>
+            </div>
+        </div>
+
+        <!-- Mobile View -->
+        <div id="view-mobile">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mobile-grid">
+                <!-- Cards injected via JS -->
+            </div>
+        </div>
+
+        <!-- Internet View -->
+        <div id="view-internet" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="internet-grid">
+                <!-- Cards injected via JS -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const data = {
+            mobile: [
+                { name: 'Verizon', color: 'border-red-600', logo: 'VZW', rates: [65, 55, 40, 30], promo: 'Get iPhone 17 Pro w/ Ultimate', perk: '$10 Disney Bundle Add-on' },
+                { name: 'T-Mobile', color: 'border-pink-500', logo: 'TMO', rates: [50, 40, 33, 25], promo: 'Taxes/Fees Included', perk: 'Netflix & Apple TV+ Included' },
+                { name: 'AT&T', color: 'border-blue-500', logo: 'ATT', rates: [51, 41, 36, 36], promo: '$1000 off S26 w/ Trade-in', perk: 'ActiveArmor Security' },
+                { name: 'Cricket', color: 'border-green-600', logo: 'CRK', rates: [60, 45, 30, 25], promo: '4 Lines for $100 Flat', perk: 'Max (w/ Ads) Included' },
+                { name: 'Google Fi', color: 'border-blue-400', logo: 'GFI', rates: [50, 40, 30, 25], promo: 'Free Pixel 10 w/ 4 Lines', perk: 'YouTube Premium 6mo' },
+                { name: 'Mint Mobile', color: 'border-teal-500', logo: 'MNT', rates: [30, 30, 15, 15], promo: '50% Off Unlimited (Intro)', perk: 'Pay 3/6/12mo Upfront' }
+            ],
+            internet: [
+                { name: 'Verizon 5G Home', price: 50, bundlePrice: 35, speed: '300-1000 Mbps', promo: 'Free Nintendo Switch w/ Sign-up' },
+                { name: 'T-Mobile Home Internet', price: 60, bundlePrice: 40, speed: '245+ Mbps', promo: '$200 Prepaid Mastercard' },
+                { name: 'AT&T Fiber', price: 80, bundlePrice: 60, speed: '1000 Mbps', promo: '20% Off when Bundled w/ Wireless' },
+                { name: 'Mint MINTernet', price: 50, bundlePrice: 30, speed: '5G Powered', promo: 'Intro rate: $15/mo for 3mo' },
+                { name: 'Google Fiber', price: 70, bundlePrice: 70, speed: '1-2 Gbps', promo: 'No-contract transparency' }
+            ]
+        };
+
+        function switchTab(tab) {
+            document.getElementById('view-mobile').classList.toggle('hidden', tab !== 'mobile');
+            document.getElementById('view-internet').classList.toggle('hidden', tab !== 'internet');
+            document.getElementById('btn-mobile').className = tab === 'mobile' ? 'tab-active py-5 px-2' : 'py-5 px-2 text-gray-500 hover:text-red-600';
+            document.getElementById('btn-internet').className = tab === 'internet' ? 'tab-active py-5 px-2' : 'py-5 px-2 text-gray-500 hover:text-red-600';
+            document.getElementById('line-control').style.visibility = tab === 'mobile' ? 'visible' : 'hidden';
+        }
+
+        function renderAll() {
+            const lines = parseInt(document.getElementById('lineCount').value);
+            const showPromos = document.getElementById('promoToggle').checked;
+
+            // Render Mobile
+            const mGrid = document.getElementById('mobile-grid');
+            mGrid.innerHTML = data.mobile.map(c => {
+                let currentRate = c.rates[lines - 1];
+                // Mint special logic for 2026 intro promo
+                if (showPromos && c.name === 'Mint Mobile' && lines >= 2) currentRate = 15;
+                
+                return `
+                    <div class="card-anim bg-white border-t-4 ${c.color} p-6 rounded-xl shadow-sm border-x border-b">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-black text-xl">${c.name}</h3>
+                            <span class="bg-gray-100 text-[10px] font-bold px-2 py-1 rounded uppercase">${c.logo}</span>
+                        </div>
+                        <div class="mb-4">
+                            <span class="text-4xl font-black">$${currentRate}</span>
+                            <span class="text-gray-500 text-sm">/line</span>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <span>${c.perk}</span>
+                            </div>
+                            ${showPromos ? `
+                            <div class="bg-yellow-50 border border-yellow-100 p-2 rounded text-yellow-800 text-xs font-bold">
+                                PROMO: ${c.promo}
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Internet
+            const iGrid = document.getElementById('internet-grid');
+            iGrid.innerHTML = data.internet.map(i => `
+                <div class="card-anim bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="font-bold text-lg mb-1">${i.name}</h3>
+                    <p class="text-xs text-gray-500 mb-4">${i.speed}</p>
+                    <div class="flex items-baseline gap-2 mb-4">
+                        <span class="text-3xl font-black">$${showPromos ? i.bundlePrice : i.price}</span>
+                        <span class="text-gray-500 text-sm">/mo</span>
+                        ${showPromos ? `<span class="text-[10px] text-green-600 font-bold px-1 bg-green-50 rounded">BUNDLED PRICE</span>` : ''}
+                    </div>
+                    <p class="text-xs leading-relaxed text-gray-600 border-t pt-3 italic">${i.promo}</p>
+                </div>
+            `).join('');
+        }
+
+        window.onload = renderAll;
+    </script>
+</body>
+</html>
