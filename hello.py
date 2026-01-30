@@ -4,7 +4,7 @@ Simple placeholder Python file created by assistant.
 """
 
 def main():
-    print("Hello from the new Python file!")
+    print("This is just a test of the system!")
 
 
 if __name__ == "__main__":
